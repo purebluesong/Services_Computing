@@ -1,37 +1,35 @@
-#coding=UTF-8
-# from urllib import request
-import requests
-from sys import argv
+# coding=UTF-8
 import sys
-import time
-import ctypes
+import requests
 import execjs
+import json
+
 
 params = {
-	'sl':'en' ,
-    'tl':'zh-CN' ,
-    'hl':'zh-CN' ,
-    'dt':'at' ,
-    'dt':'bd' ,
-    'dt':'ex' ,
-    'dt':'ld' ,
-    'dt':'md' ,
-    'dt':'qca' ,
-    'dt':'rw' ,
-    'dt':'rm' ,
-    'dt':'ss' ,
-    'dt':'t' ,
-    'ie':'UTF-8' ,
-    'oe':'UTF-8' ,
-    'source':'bh' ,
-    'ssel':'0' ,
-    'tsel':'0' ,
-    'otf':'1' ,
-    'kc':'1' ,
-    'tk':'1' ,
-    'q':'1' ,
-}
-googleTranslateUrl = "http://translate.google.cn/translate_a/single?client=t"
+    'sl': 'en',
+    'tl': 'zh-CN',
+    'hl': 'zh-CN',
+    'dt': 'at',
+    'dt': 'bd',
+    'dt': 'ex',
+    'dt': 'ld',
+    'dt': 'md',
+    'dt': 'qca',
+    'dt': 'rw',
+    'dt': 'rm',
+    'dt': 'ss',
+    'dt': 't',
+    'ie': 'UTF-8',
+    'oe': 'UTF-8',
+    'source': 'bh',
+    'ssel': '0',
+    'tsel': '0',
+    'otf': '1',
+    'kc': '1',
+    'tk': '1',
+    'q': '1',
+    }
+TRANSLATE_URL = "http://translate.google.cn/translate_a/single?client=t"
 
 
 ctx = execjs.compile("""
@@ -66,25 +64,17 @@ function tk(a) {
 }
 """)
 
-def tranlateCommand(argv):
-	text = ' '.join(argv)
-	params['q'] = text
-	params['tk'] = ctx.call("tk",text)
-	answer = requests.get(googleTranslateUrl,params).text
-	print answer.replace('[','').replace(']','').split(',')[0]
 
-def tranlate():
-	while(True):
-		text = raw_input("Input tranlate:")
-		params['q'] = text
-		params['tk'] = ctx.call("tk",text)
-		print(params['tk'])
-		print(requests.get(googleTranslateUrl,params).text)
+def tranlate(text):
+    params['q'] = text
+    params['tk'] = ctx.call("tk", text)
+    answer = requests.get(TRANSLATE_URL, params).json()
+    return answer[0][0][0]
+
 
 if __name__ == "__main__":
-	if 'gotrans.py' in argv:
-		argv.remove('gotrans.py')
-	if len(argv) != 0 :
-		tranlateCommand(argv[1:])
-	else:
-		tranlate()
+    if len(sys.argv) > 1:
+        print tranlate(sys.argv[1])
+    else:
+        while(True):
+            tranlate(raw_input("input translate:"))
